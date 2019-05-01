@@ -13,6 +13,13 @@
 		<td>{{ item.petal_length }}</td>
 		<td>{{ item.petal_width }}</td>
 		<td>{{ item.CLASS }}</td>
+		<td>
+			<form action="{% url 'delete' %}" method="post">
+			{% csrf_token %}
+				<input type="hidden" name="iris_id" value="{{ item.id }}">
+				<input type="submit" value="delete">
+			</form>
+		</td>
 	</tr>
 	{% endfor %}
 </table>

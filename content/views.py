@@ -44,3 +44,8 @@ def create(request):
 	c = data.get('CLASS')
 	Iris.objects.create_iris(sl,sw,pl,pw,c).save()
 	return HttpResponseRedirect(reverse('homepage'))
+
+def delete(request):
+	iris_id = request.POST.get('iris_id')
+	Iris.objects.get(id=iris_id).delete()
+	return HttpResponseRedirect(reverse('homepage'))

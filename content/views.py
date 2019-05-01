@@ -49,3 +49,14 @@ def delete(request):
 	iris_id = request.POST.get('iris_id')
 	Iris.objects.get(id=iris_id).delete()
 	return HttpResponseRedirect(reverse('homepage'))
+
+def update(request):
+	data = request.POST.copy()
+	iris_id = request.POST.get('iris_id')
+	sl = data.get('sepal_length')
+	sw = data.get('sepal_width')
+	pl = data.get('petal_length')
+	pw = data.get('petal_width')
+	c = data.get('CLASS')
+	Iris.objects.filter(id=iris_id).update(sepal_length=sl, sepal_width=sw, petal_length=pl, petal_width=pw)
+	return HttpResponseRedirect(reverse('homepage'))

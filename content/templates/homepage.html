@@ -8,11 +8,18 @@
 	<tr><th>sepal length (cm)</th><th>sepal width (cm)</th><th>petal length (cm)</th><th>petal width (cm)</th><th>class</th></tr>
 	{% for item in iris_list %}
 	<tr>
-		<td>{{ item.sepal_length }}</td>
-		<td>{{ item.sepal_width }}</td>
-		<td>{{ item.petal_length }}</td>
-		<td>{{ item.petal_width }}</td>
+	<form action="{% url 'update'%}" method="post">
+		{% csrf_token %}
+		<td><input type="number" step="0.1" max="9.9" name="sepal_length" value="{{ item.sepal_length }}"></td>
+		<td><input type="number" step="0.1" max="9.9" name="sepal_width" value="{{ item.sepal_width }}"></td>
+		<td><input type="number" step="0.1" max="9.9" name="petal_length" value="{{ item.petal_length }}"></td>
+		<td><input type="number" step="0.1" max="9.9" name="petal_width" value="{{ item.petal_width }}"></td>
 		<td>{{ item.CLASS }}</td>
+		<td>
+			<input type="hidden" name="iris_id" value="{{ item.id }}">
+			<input type="submit" value="update">
+		</td>
+	</form>
 		<td>
 			<form action="{% url 'delete' %}" method="post">
 			{% csrf_token %}

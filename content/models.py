@@ -11,9 +11,9 @@ class Iris(models.Model):
 	sepal_width = models.DecimalField(max_digits=2, decimal_places=1)
 	petal_length = models.DecimalField(max_digits=2, decimal_places=1)
 	petal_width = models.DecimalField(max_digits=2, decimal_places=1)
-	SETOSA = "SE"
-	VERSICOLOUR = "VE"
-	VIRGINICA = "VI"
+	SETOSA = "SETOSA"
+	VERSICOLOUR = "VERSICOLOUR"
+	VIRGINICA = "VIRGINICA"
 	CLASS_CHOICES = (
 		(SETOSA, "SETOSA"), 
 		(VERSICOLOUR, "VERSICOLOUR"), 

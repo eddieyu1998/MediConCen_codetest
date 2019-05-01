@@ -3,7 +3,8 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.urls import reverse
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-
+from content.models import *
+from content.forms import IrisForm
 # Create your views here.
 def login(request):
 	return HttpResponseRedirect(reverse('login'))
@@ -28,5 +29,18 @@ def homepage(request):
 		role = "admin"
 	else:
 		role = "normal user"
+	table = "Iris dataset"
+	iris_list = Iris.objects.all()
+	form = IrisForm()
 	template_name = "homepage.html"
-	return render(request, template_name, {'role': role})
+	return render(request, template_name, {'role': role, 'table': table, 'iris_list': iris_list, 'form': form})
+
+def create(request):
+	data = request.POST.copy()
+	sl = data.get('sepal_length')
+	sw = data.get('sepal_width')
+	pl = data.get('petal_length')
+	pw = data.get('petal_width')
+	c = data.get('CLASS')
+	Iris.objects.create_iris(sl,sw,pl,pw,c).save()
+	return HttpResponseRedirect(reverse('homepage'))

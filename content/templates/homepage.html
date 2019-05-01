@@ -2,4 +2,27 @@
 {% block content %}
 <h1>Homepage</h1>
 <span>You have logged in as a {{ role }}.</span> <a href="{% url 'logout' %}">Logout</a>
+<br><br>
+{{ table }}
+<table cellpadding="2">
+	<tr><th>sepal length (cm)</th><th>sepal width (cm)</th><th>petal length (cm)</th><th>petal width (cm)</th><th>class</th></tr>
+	{% for item in iris_list %}
+	<tr>
+		<td>{{ item.sepal_length }}</td>
+		<td>{{ item.sepal_width }}</td>
+		<td>{{ item.petal_length }}</td>
+		<td>{{ item.petal_width }}</td>
+		<td>{{ item.CLASS }}</td>
+	</tr>
+	{% endfor %}
+</table>
+<br>
+Create new entry:
+<form action="{% url 'create' %}" method="post">
+{% csrf_token %}
+	{% for field in form %}
+		<br>{{ field.label_tag }} {{ field }}
+	{% endfor %}
+	<input type="submit" value="Create">
+</form>
 {% endblock %}

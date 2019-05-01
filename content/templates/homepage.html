@@ -1,0 +1,5 @@
+{% extends 'base.html' %}
+{% block content %}
+<h1>Homepage</h1>
+<span>You have logged in as a {{ role }}.</span> <a href="{% url 'logout' %}">Logout</a>
+{% endblock %}

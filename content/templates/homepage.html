@@ -19,10 +19,10 @@
 {% if cat == "files" %}
 <!-- showing files-->
 {{ table }}
-
 <table cellpadding="2">
 	<tr><th>File name</th><th>File size</th><th>Last modified</th></tr>
 	{% for item in entries %}
+		{% if item.hash_id != update %}
 		<tr>
 			<td>{{ item.filename }}</td>
 			<td>{{ item.filesize }}</td>
@@ -35,6 +35,13 @@
 				</form>
 			</td>
 			<td>
+				<form action="{% url 'update_file' %}" method="post">
+				{% csrf_token %}
+					<input type="hidden" name="file_id" value="{{ item.hash_id }}">
+					<input type="submit" value="Update">
+				</form>
+			</td>
+			<td>
 				<form action="{% url 'delete_file' %}" method="post">
 				{% csrf_token %}
 					<input type="hidden" name="file_id" value="{{ item.hash_id }}">
@@ -42,6 +49,22 @@
 				</form>
 			</td>
 		</tr>
+		{% else %}
+		<tr>
+			<form enctype="multipart/form-data" action="{% url 'handle_update_file' %}" method="post">
+			{% csrf_token %}
+				<td><input type="text" name="filename" value="{{ item.filename }}"maxlength="100" required></td>
+				<td>{{ item.filesize }}</td>
+				<td>{{ item.last_modified }}</td>
+				<td><input type="file" name="file"></td>
+				<input type="hidden" name="file_id" value="{{ item.hash_id }}">
+				<td><input type="submit" value="Update"></td>
+			</form>
+			<form action="{% url 'homepage' %}" method="get">
+				<td><input type="submit" value="Cancel"></td>
+			</form>
+		</tr>
+		{% endif %}
 	{% endfor %}
 </table>
 

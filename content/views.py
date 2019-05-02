@@ -32,7 +32,7 @@ def register(request):
 		template_name = "registration/registration.html"
 		return render(request, template_name, {'form': form, 'errors': errors})
 
-def homepage(request, message=""):
+def homepage(request, message="", update=""):
 	if request.user.is_superuser:
 		role = "admin"
 	else:
@@ -47,8 +47,11 @@ def homepage(request, message=""):
 			table = "Iris dataset"
 			form = IrisForm()
 			entries = Iris.objects.all()
+	if update:
+		update = int(update)
 	template_name = "homepage.html"
-	return render(request, template_name, {'role': role, 'cat':cat, 'table': table, 'entries': entries, 'form': form})
+	return render(request, template_name, {'role': role, 'cat':cat, 'table': table, 
+		'entries': entries, 'form': form, 'message': message, 'update': update})
 
 #handle the create request
 def create(request):
@@ -116,11 +119,37 @@ def download_file(request):
 			return response"""
 
 def delete_file(request):
+	if request.method == "POST":
+		file_id = request.POST['file_id']
+		file = UserFile.objects.get(hash_id=int(file_id))
+		if request.user != file.owner:
+			return homepage(request, "You don't have access to the file!")
+		else:
+			file.upload.delete()
+			file.delete()
+			return HttpResponseRedirect(reverse('homepage'))
+	return homepage(request)
+
+def update_file(request):
 	file_id = request.POST['file_id']
-	file = UserFile.objects.get(hash_id=int(file_id))
-	if request.user != file.owner:
-		return homepage(request, "You don't have access to the file!")
-	else:
-		file.upload.delete()
-		file.delete()
-		return HttpResponseRedirect(reverse('homepage'))
+	print(file_id)
+	return homepage(request, update=file_id)
+
+def handle_update_file(request):
+	if request.method == "POST":
+		file_id = request.POST['file_id']
+		file = UserFile.objects.get(hash_id=file_id)
+		if request.user != file.owner:
+			return homepage(request, "You don't have access to the file!")
+		else:
+			filename = request.POST['filename']
+			file.filename = filename
+			file.last_modified = datetime.now()
+			file.save()
+			if request.FILES:
+				file.upload.delete()
+				file.filesize = request.FILES['file'].size
+				file.upload = request.FILES['file']
+				file.save()
+			return HttpResponseRedirect(reverse('homepage'))
+	return homepage(request)

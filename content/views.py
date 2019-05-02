@@ -4,7 +4,7 @@ from django.urls import reverse
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from content.models import *
-from content.forms import IrisForm, UploadFileForm, UserFileForm
+from content.forms import IrisForm, UploadFileForm
 from django.conf import settings
 import django.core.files.uploadedfile
 from datetime import datetime
@@ -79,16 +79,21 @@ def update(request):
 	Iris.objects.filter(id=iris_id).update(sepal_length=sl, sepal_width=sw, petal_length=pl, petal_width=pw)
 	return HttpResponseRedirect(reverse('homepage'))
 
+def sdbm_hash(instr):
+	hash = 0
+	for c in instr:
+		hash = int(ord(c)) + (hash << 6) + (hash << 16) - hash
+	return hash & 0x7fffffffffffffff
+
 def upload_file(request):
 	if request.method == "POST":
-		print("[debug] RECEIVED FORM", request.POST)
 		form = UploadFileForm(request.POST, request.FILES)
 		if form.is_valid():
-			print("[debug] FORM VALID, file:", request.POST['title'])
 			file = request.FILES['file']
 			filename = request.POST['title']
-			#handle_uploaded_file(filename, request.FILES['file'])
-			f = UserFile.objects.create_file(filename, file.size, datetime.now(), request.user, request.FILES['file'])
+			hash_id = sdbm_hash(str(request.user)+filename+str(file.size)+str(datetime.now()))
+			f = UserFile.objects.create_file(hash_id, filename, file.size, datetime.now(), request.user)
+			f.upload = request.FILES['file']
 			f.save()
 			print(f)
 			return HttpResponseRedirect(reverse('homepage'))
@@ -96,18 +101,16 @@ def upload_file(request):
 
 def download_file(request):
 	file_id = request.POST['file_id']
-	file = UserFile.objects.get(id=file_id)
+	file = UserFile.objects.get(hash_id=int(file_id))
 	if request.user != file.owner:
 		return homepage(request, "You don't have access to the file!")
 	else:
+		response = HttpResponse(file.upload, content_type="multipart/form-data")
+		response['Content-Disposition'] = 'attachment; filename="'+file.filename+'"'
+		return response
+		"""
 		path = os.path.join(settings.MEDIA_ROOT, 'userfile/'+file.filename)
 		with open(path, 'rb') as f:
 			response = HttpResponse(f.read(), content_type="multipart/form-data")
 			response['Content-Disposition'] = 'attachment; filename="'+file.filename+'"'
-			return response
-"""
-def handle_uploaded_file(name, f):
-	with open(os.path.join(settings.MEDIA_ROOT+name), 'wb+') as destination:
-		print("[debug] WRITE FILE TO:", settings.MEDIA_ROOT+'userfile/'+name)
-		for chunk in f.chunks():
-			destination.write(chunk)"""
+			return response"""

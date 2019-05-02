@@ -3,6 +3,11 @@
 	<head>
 		<meta charset="utf-8">
 		<title>{% block title %}MediConCen Code Test WebPage{% endblock %}</title>
+		{% if message %}
+		<script>
+    		alert('{{ message }}');
+		</script>
+		{% endif %}
 	</head>
 	<body>
 		<main>

@@ -2,3 +2,6 @@
 *.pyo
 *.sqlite3
 __pycache__/
+migrations/
+temp/
+userfile/

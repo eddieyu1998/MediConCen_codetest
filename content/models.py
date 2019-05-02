@@ -1,4 +1,6 @@
 from django.db import models
+from django.contrib.auth.models import User
+from datetime import datetime
 
 #Manager for creating instance of Iris
 class IrisManager(models.Manager):
@@ -21,3 +23,16 @@ class Iris(models.Model):
 	)
 	CLASS = models.CharField(max_length=11, choices=CLASS_CHOICES)
 	objects = IrisManager()
+
+class UserFileManager(models.Manager):
+	def create_file(self, fn, fs, lm, o, u):
+		f = self.create(filename=fn, filesize=fs, last_modified=lm, owner=o, upload=u)
+		return f
+
+class UserFile(models.Model):
+	filename = models.CharField(max_length=100)
+	filesize = models.IntegerField()
+	last_modified = models.DateTimeField(default=datetime.now())
+	owner = models.ForeignKey(User, on_delete=models.CASCADE)
+	upload = models.FileField(upload_to='userfile')
+	objects = UserFileManager()

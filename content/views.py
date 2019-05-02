@@ -114,3 +114,13 @@ def download_file(request):
 			response = HttpResponse(f.read(), content_type="multipart/form-data")
 			response['Content-Disposition'] = 'attachment; filename="'+file.filename+'"'
 			return response"""
+
+def delete_file(request):
+	file_id = request.POST['file_id']
+	file = UserFile.objects.get(hash_id=int(file_id))
+	if request.user != file.owner:
+		return homepage(request, "You don't have access to the file!")
+	else:
+		file.upload.delete()
+		file.delete()
+		return HttpResponseRedirect(reverse('homepage'))

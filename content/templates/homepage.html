@@ -34,6 +34,13 @@
 					<input type="submit" value="Download">
 				</form>
 			</td>
+			<td>
+				<form action="{% url 'delete_file' %}" method="post">
+				{% csrf_token %}
+					<input type="hidden" name="file_id" value="{{ item.hash_id }}">
+					<input type="submit" value="Delete">
+				</form>
+			</td>
 		</tr>
 	{% endfor %}
 </table>

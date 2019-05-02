@@ -53,7 +53,7 @@ def homepage(request, message="", update=""):
 	return render(request, template_name, {'role': role, 'cat':cat, 'table': table, 
 		'entries': entries, 'form': form, 'message': message, 'update': update})
 
-#handle the create request
+#deprecated
 def create(request):
 	data = request.POST.copy()
 	sl = data.get('sepal_length')
@@ -64,13 +64,13 @@ def create(request):
 	Iris.objects.create_iris(sl,sw,pl,pw,c).save()
 	return HttpResponseRedirect(reverse('homepage'))
 
-#handle the delete request
+#deprecated
 def delete(request):
 	iris_id = request.POST.get('iris_id')
 	Iris.objects.get(id=iris_id).delete()
 	return HttpResponseRedirect(reverse('homepage'))
 
-#handle the update request
+#deprecated
 def update(request):
 	data = request.POST.copy()
 	iris_id = request.POST.get('iris_id')
@@ -82,26 +82,29 @@ def update(request):
 	Iris.objects.filter(id=iris_id).update(sepal_length=sl, sepal_width=sw, petal_length=pl, petal_width=pw)
 	return HttpResponseRedirect(reverse('homepage'))
 
+#used for generating hash id for files
 def sdbm_hash(instr):
 	hash = 0
 	for c in instr:
 		hash = int(ord(c)) + (hash << 6) + (hash << 16) - hash
 	return hash & 0x7fffffffffffffff
 
+#for user to upload files
 def upload_file(request):
 	if request.method == "POST":
-		form = UploadFileForm(request.POST, request.FILES)
-		if form.is_valid():
-			file = request.FILES['file']
-			filename = request.POST['title']
-			hash_id = sdbm_hash(str(request.user)+filename+str(file.size)+str(datetime.now()))
-			f = UserFile.objects.create_file(hash_id, filename, file.size, datetime.now(), request.user)
-			f.upload = request.FILES['file']
-			f.save()
-			print(f)
-			return HttpResponseRedirect(reverse('homepage'))
+		file = request.FILES['file']
+		split = file.name.split('.')
+		filename = ".".join(split[0:-1])
+		filetype = "."+split[-1]
+		filesize = file.size
+		hash_id = sdbm_hash(str(request.user.id)+str(request.user)+filename+str(filesize)+str(datetime.now()))
+		f = UserFile.objects.create_file(hash_id, filename, filetype, filesize, datetime.now(), request.user)
+		f.upload = file
+		f.save()
+		return HttpResponseRedirect(reverse('homepage'))
 	return homepage(request)
 
+#for user to download files
 def download_file(request):
 	file_id = request.POST['file_id']
 	file = UserFile.objects.get(hash_id=int(file_id))
@@ -109,15 +112,10 @@ def download_file(request):
 		return homepage(request, "You don't have access to the file!")
 	else:
 		response = HttpResponse(file.upload, content_type="multipart/form-data")
-		response['Content-Disposition'] = 'attachment; filename="'+file.filename+'"'
+		response['Content-Disposition'] = 'attachment; filename="'+file.filename+file.filetype+'"'
 		return response
-		"""
-		path = os.path.join(settings.MEDIA_ROOT, 'userfile/'+file.filename)
-		with open(path, 'rb') as f:
-			response = HttpResponse(f.read(), content_type="multipart/form-data")
-			response['Content-Disposition'] = 'attachment; filename="'+file.filename+'"'
-			return response"""
 
+#for user to delete files
 def delete_file(request):
 	if request.method == "POST":
 		file_id = request.POST['file_id']
@@ -130,11 +128,12 @@ def delete_file(request):
 			return HttpResponseRedirect(reverse('homepage'))
 	return homepage(request)
 
+#get the entry user want to update, and update the view accordingly
 def update_file(request):
 	file_id = request.POST['file_id']
-	print(file_id)
 	return homepage(request, update=file_id)
 
+#apply the update
 def handle_update_file(request):
 	if request.method == "POST":
 		file_id = request.POST['file_id']
@@ -148,6 +147,7 @@ def handle_update_file(request):
 			file.save()
 			if request.FILES:
 				file.upload.delete()
+				file.filetype = "."+request.FILES['file'].name.split('.')[-1]
 				file.filesize = request.FILES['file'].size
 				file.upload = request.FILES['file']
 				file.save()

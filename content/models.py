@@ -23,20 +23,21 @@ class Iris(models.Model):
 	)
 	CLASS = models.CharField(max_length=11, choices=CLASS_CHOICES)
 	objects = IrisManager()
-"""
-def store_path(instance, filename):
-	return str(instance.hash_id)"""
 
+#Manager for creating instance of UserFile
 class UserFileManager(models.Manager):
-	def create_file(self, hash_id, fn, fs, lm, o):
-		f = self.create(hash_id=hash_id, filename=fn, filesize=fs, last_modified=lm, owner=o)
+	def create_file(self, hash_id, fn, ft, fs, lm, o):
+		f = self.create(hash_id=hash_id, filename=fn, filetype=ft, filesize=fs, 
+			last_modified=lm, owner=o)
 		return f
 
+#stores the files of a user
 class UserFile(models.Model):
 	hash_id = models.BigAutoField(primary_key=True)
 	filename = models.CharField(max_length=100)
+	filetype = models.CharField(max_length=20)
 	filesize = models.IntegerField()
 	last_modified = models.DateTimeField(default=datetime.now())
 	owner = models.ForeignKey(User, on_delete=models.CASCADE)
-	upload = models.FileField(upload_to='userfile')#store_path)
+	upload = models.FileField(upload_to='userfile')
 	objects = UserFileManager()

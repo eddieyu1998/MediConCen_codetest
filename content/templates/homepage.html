@@ -19,7 +19,7 @@
 {% if cat == "files" %}
 <!-- showing files-->
 {{ table }}
-<table cellpadding="2">
+<table cellpadding="5">
 	<tr><th>File name</th><th>File size</th><th>Last modified</th></tr>
 	{% for item in entries %}
 		{% if item.hash_id != update %}
@@ -72,16 +72,14 @@
 Create new file:
 <form enctype="multipart/form-data" action="{% url 'upload_file' %}" method="post">
 {% csrf_token %}
-	{% for field in form %}
-		<br>{{ field.label_tag }} {{ field }}
-	{% endfor %}
+	<input type="file" name="file">
 	<input type="submit" value="Upload">
 </form>
 
 {% else %}
 <!-- showing example database-->
 {{ table }}
-<table cellpadding="2">
+<table cellpadding="5">
 	<tr><th>sepal length (cm)</th><th>sepal width (cm)</th><th>petal length (cm)</th><th>petal width (cm)</th><th>class</th></tr>
 	{% for item in entries %}
 	<tr>

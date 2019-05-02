@@ -5,15 +5,18 @@ from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from content.models import *
 from content.forms import IrisForm
-# Create your views here.
+
+#redirect to the login page
 def login(request):
 	return HttpResponseRedirect(reverse('login'))
 
+#return the registration page
 def registration(request):
 	form = UserCreationForm()
 	template_name = "registration/registration.html"
 	return render(request, template_name, {'form': form})
 
+#register the user
 def register(request):
 	form = UserCreationForm(request.POST)
 	if form.is_valid():
@@ -35,6 +38,7 @@ def homepage(request):
 	template_name = "homepage.html"
 	return render(request, template_name, {'role': role, 'table': table, 'iris_list': iris_list, 'form': form})
 
+#handle the create request
 def create(request):
 	data = request.POST.copy()
 	sl = data.get('sepal_length')
@@ -45,11 +49,13 @@ def create(request):
 	Iris.objects.create_iris(sl,sw,pl,pw,c).save()
 	return HttpResponseRedirect(reverse('homepage'))
 
+#handle the delete request
 def delete(request):
 	iris_id = request.POST.get('iris_id')
 	Iris.objects.get(id=iris_id).delete()
 	return HttpResponseRedirect(reverse('homepage'))
 
+#handle the update request
 def update(request):
 	data = request.POST.copy()
 	iris_id = request.POST.get('iris_id')

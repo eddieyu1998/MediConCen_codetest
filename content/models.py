@@ -1,6 +1,6 @@
 from django.db import models
 
-# Create your models here.
+#Manager for creating instance of Iris
 class IrisManager(models.Manager):
 	def create_iris(self, sl, sw, pl, pw, c):
 		iris = self.create(sepal_length=sl, sepal_width=sw, petal_length=pl, petal_width=pw, CLASS=c)

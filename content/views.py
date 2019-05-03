@@ -94,8 +94,15 @@ def upload_file(request):
 	if request.method == "POST":
 		file = request.FILES['file']
 		split = file.name.split('.')
-		filename = ".".join(split[0:-1])
-		filetype = "."+split[-1]
+		if len(split) > 2:
+			filename = ".".join(split[0:-1])
+			filetype = "."+split[-1]
+		elif split[0] == "" or len(split) == 1:
+			filename = file.name
+			filetype = ""
+		else:
+			filename = split[0]
+			filetype = "."+split[-1]
 		filesize = file.size
 		hash_id = sdbm_hash(str(request.user.id)+str(request.user)+filename+str(filesize)+str(datetime.now()))
 		f = UserFile.objects.create_file(hash_id, filename, filetype, filesize, datetime.now(), request.user)

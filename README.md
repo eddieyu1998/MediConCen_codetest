@@ -25,17 +25,18 @@ default port is 8000
 User can login or register via this page.
 
 ## Homepage
-User can view the dataset as a table. Create new entries, update or delete entries from the table.
+User can view and operate on his files
 
-To create, fill in the fields at the bottom of the page and hit create.
+To upload new files, hit choose file and uplaod.
 
-To delete an entry, hit delete on the row to be deleted
+To download or delete files, hit the corresponding button
 
-To update, hit update after modifying the fields in the row
+To update a file, hit the update button on the specific row, change the file name or upload a new file, then hit update.
 
-At this stage, the system does not support:
+At this stage, the system does not contains:
 
+* user files scanning
 * sorting of entries
 * user account management
-* concurrency issues prevention
+* duplicate file name prevention
 * aesthetic

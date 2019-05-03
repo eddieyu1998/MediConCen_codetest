@@ -154,7 +154,13 @@ def handle_update_file(request):
 			file.save()
 			if request.FILES:
 				file.upload.delete()
-				file.filetype = "."+request.FILES['file'].name.split('.')[-1]
+				split = request.FILES['file'].name.split('.')
+				if len(split)>2:
+					file.filetype = "."+split[-1]
+				elif split[0] == "" or len(split) == 1:
+					file.filetype = ""
+				else:
+					file.filetype = "."+split[-1]
 				file.filesize = request.FILES['file'].size
 				file.upload = request.FILES['file']
 				file.save()
